@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "202910744709",
+    "project_id": "frikandelspecial999",
+    "storage_bucket": "frikandelspecial999.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:202910744709:android:2953214ec70a1b9ef0e9ec",
+        "android_client_info": {
+          "package_name": "com.example.frikandel_special999"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0iC0-cH-MsdSotYp9Ciazc_6Avhz7FoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
