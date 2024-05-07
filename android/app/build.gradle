@@ -44,15 +44,19 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.frikandel_special999"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-    }
+    applicationId "com.example.frikandel_special999" // Zorg ervoor dat dit jouw unieke applicatie ID is.
+    minSdkVersion 21 // Nodig voor de Auth0 package.
+    targetSdkVersion flutter.targetSdkVersion
+    versionCode flutterVersionCode.toInteger()
+    versionName flutterVersionName
+
+    // Voeg de Auth0 placeholders toe:
+    manifestPlaceholders = [
+        auth0Domain: "dev-xv0jcmkzbkhhxl1c.eu.auth0.com", // Jouw Auth0 domein
+        auth0Scheme: "https" // Scheme moet 'https' zijn
+    ]
+}
+
 
     buildTypes {
         release {

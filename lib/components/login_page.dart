@@ -12,6 +12,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
   @override
   void initState() {
     super.initState();
+    // Zorg ervoor dat je hier je correcte domain en clientId gebruikt.
     auth0 = Auth0(
       'dev-xv0jcmkzbkhhxl1c.eu.auth0.com',
       '7ymWdR0RxTzOfBnwEXmVYr8TN7OlcLQy',
@@ -21,9 +22,11 @@ class _MyLoginPageState extends State<MyLoginPage> {
   Future<void> _login() async {
     try {
       final credentials = await auth0.webAuthentication().login(useHTTPS: true);
-      // Handle successful login, access credentials.accessToken for token and credentials.user for user info
+      // Handle successful login
+      print('Login Successful: Access Token - ${credentials.accessToken}');
     } catch (e) {
       // Handle login error
+      print('Login Error: $e');
     }
   }
 
