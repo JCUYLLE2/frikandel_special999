@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './login_page.dart'; // Importeer de LoginPage
+import 'package:frikandel_special999/components/login_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -31,11 +31,10 @@ class HomePage extends StatelessWidget {
 void main() {
   runApp(MaterialApp(
     title: 'Home Demo',
-    initialRoute:
-        '/login', // Verander naar /home als je direct naar de homepage wilt gaan
+    initialRoute: '/login',
     routes: {
-      '/login': (context) => const LoginPage(),
-      '/home': (context) => const HomePage(),
+      '/login': (context) => MyLoginPage(),
+      '/home': (context) => HomePage(),
     },
   ));
 }

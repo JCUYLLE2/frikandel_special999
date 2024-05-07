@@ -1,109 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:auth0_flutter/auth0_flutter.dart';
 
-void main() {
-  runApp(const MyApp());
+class MyLoginPage extends StatefulWidget {
+  @override
+  _MyLoginPageState createState() => _MyLoginPageState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class _MyLoginPageState extends State<MyLoginPage> {
+  late Auth0 auth0;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomePage(),
-        '/login': (context) => const LoginPage(),
-      },
+  void initState() {
+    super.initState();
+    auth0 = Auth0(
+      'dev-xv0jcmkzbkhhxl1c.eu.auth0.com',
+      '7ymWdR0RxTzOfBnwEXmVYr8TN7OlcLQy',
     );
   }
-}
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  Future<void> _login() async {
+    try {
+      final credentials = await auth0.webAuthentication().login(useHTTPS: true);
+      // Handle successful login, access credentials.accessToken for token and credentials.user for user info
+    } catch (e) {
+      // Handle login error
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: Text('Login'),
       ),
       body: Center(
         child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/login');
-          },
-          child: const Text('Login'),
-        ),
-      ),
-    );
-  }
-}
-
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // Navigeer naar de ProfilePage en geef de callback door
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfilePageWithCallback(
-                  callback: () {
-                    // Doe hier wat nodig is om uit te loggen
-                    // In dit voorbeeld, pop het huidige scherm terug naar de loginpagina
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-            );
-          },
-          child: const Text('Log In'),
-        ),
-      ),
-    );
-  }
-}
-
-class ProfilePageWithCallback extends StatelessWidget {
-  final VoidCallback callback;
-
-  const ProfilePageWithCallback({
-    Key? key,
-    required this.callback,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Welcome to your profile page!',
-              style: TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Roep de callback aan wanneer de gebruiker uitlogt
-                callback();
-              },
-              child: const Text('Log Out'),
-            ),
-          ],
+          onPressed: _login,
+          child: Text('Login with Auth0'),
         ),
       ),
     );
