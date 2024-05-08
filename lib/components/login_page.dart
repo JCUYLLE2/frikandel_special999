@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frikandel_special999/components/main_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomePage(),
         '/login': (context) => const LoginPage(),
+        '/main': (context) => const MainPage(), // Voeg deze regel toe
       },
     );
   }
@@ -52,18 +54,9 @@ class LoginPage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            // Navigeer naar de ProfilePage en geef de callback door
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (context) => ProfilePageWithCallback(
-                  callback: () {
-                    // Doe hier wat nodig is om uit te loggen
-                    // In dit voorbeeld, pop het huidige scherm terug naar de loginpagina
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
+              MaterialPageRoute(builder: (context) => const MainPage()),
             );
           },
           child: const Text('Log In'),
