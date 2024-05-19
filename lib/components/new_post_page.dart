@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:frikandel_special999/singleton.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -23,7 +24,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
   Future<void> _submitPost() async {
     print('Submitting post...');
-    final FirebaseFirestore db = FirebaseFirestore.instance;
+    final FirebaseFirestore db = SettingsSingleton().myDB;
 
     // Voeg de post toe aan de Firestore-collectie "posts"
     await db.collection("posts").add({

@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'frikandelspecial999.appspot.com',
     measurementId: 'G-0YXQ3C8C22',
   );
+
 }
