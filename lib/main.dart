@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:frikandel_special999/components/home_page.dart';
+import 'package:frikandel_special999/components/login_page.dart';
+import 'package:frikandel_special999/components/main_page.dart';
 import 'firebase_options.dart'; // Importeer de Firebase-opties
-import './components/login_page.dart'; // Importeer de LoginPage
-import './components/main_page.dart'; // Zorg ervoor dat MainPage correct geïmporteerd is
-import 'singleton.dart'; // Importeer de Singleton-klasse die je hebt gemaakt
+
+import 'singleton.dart'; // Importeer de Singleton-klasse
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +20,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(), // Start de app met de LoginPage
+      initialRoute: '/home', // Start de app op de home pagina
+      routes: {
+        '/home': (context) => const HomePage(),
+        '/login': (context) => const LoginPage(),
+        '/main': (context) => const MainPage(),
+      },
     );
   }
 }

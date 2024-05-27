@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart'; // Dit is je HomePage die als feed fungeert
-import 'profile_page.dart'; // Stel je profiel-pagina voor
-import 'new_post_page.dart'; // Stel je nieuwe post-pagina voor
+import 'home_page.dart'; // Importeer de HomePage
+import 'profile_page.dart'; // Importeer de ProfilePage
+import 'new_post_page.dart'; // Importeer de NewPostPage
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -13,14 +13,21 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0; // Houdt bij welke tab momenteel geselecteerd is
 
-  // Update hier met je HomePage, NewPostPage, en ProfilePage
-  final List<Widget> _widgetOptions = [
-    HomePage(),
-    NewPostPage(),
-    ProfilePage(callback: (BuildContext context) {
-      // Logout-functie of andere callback
-    }),
-  ];
+  late List<Widget> _widgetOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _widgetOptions = [
+      const HomePage(),
+      const NewPostPage(),
+      ProfilePage(
+        callback: () {
+          Navigator.pushReplacementNamed(context, '/login');
+        },
+      ),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -31,10 +38,10 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _widgetOptions,
+      appBar: AppBar(
+        title: const Text('Main Page'),
       ),
+      body: _widgetOptions[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

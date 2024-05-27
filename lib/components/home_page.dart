@@ -1,41 +1,32 @@
 import 'package:flutter/material.dart';
-import './login_page.dart'; // Importeer de LoginPage
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
       ),
-      body: const Center(
-        child: Text(
-          'Welkom bij de homepagina!',
-          style: TextStyle(fontSize: 24.0),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Welkom bij de homepagina!',
+              style: TextStyle(fontSize: 24.0),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/login');
+              },
+              child: const Text('Meld je hier aan'),
+            ),
+          ],
         ),
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    title: 'Home Demo',
-    initialRoute:
-        '/login', // Verander naar /home als je direct naar de homepage wilt gaan
-    routes: {
-      '/login': (context) => const LoginPage(),
-      '/home': (context) => const HomePage(),
-    },
-  ));
 }
