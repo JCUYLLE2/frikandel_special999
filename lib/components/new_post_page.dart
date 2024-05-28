@@ -4,6 +4,7 @@ import 'package:frikandel_special999/singleton.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart'; // Nieuwe import voor Firebase Storage
+import 'package:frikandel_special999/components/post_model.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({Key? key}) : super(key: key);
@@ -58,7 +59,7 @@ class _NewPostPageState extends State<NewPostPage> {
       print('Post succesvol ingediend met ID: ${docRef.id}');
 
       // Navigeer naar de hoofdpagina (de feed) nadat de post is ingediend
-      Navigator.pushReplacementNamed(context, '/main');
+      Navigator.pushReplacementNamed(context, '/feed');
     } catch (error) {
       print('Fout bij het indienen van de post: $error');
       // Toon een foutmelding aan de gebruiker

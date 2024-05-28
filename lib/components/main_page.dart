@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frikandel_special999/components/feed_page.dart';
 import 'home_page.dart'; // Importeer de HomePage
 import 'profile_page.dart'; // Importeer de ProfilePage
 import 'new_post_page.dart'; // Importeer de NewPostPage
@@ -19,7 +20,11 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _widgetOptions = [
-      const HomePage(),
+      FeedPage(
+        callback: () {
+          Navigator.pushReplacementNamed(context, '/feed');
+        },
+      ),
       const NewPostPage(),
       ProfilePage(
         callback: () {
@@ -39,7 +44,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Main Page'),
+        title: const Text(''),
       ),
       body: _widgetOptions[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

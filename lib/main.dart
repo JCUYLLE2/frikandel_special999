@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:frikandel_special999/components/feed_page.dart';
 import 'package:frikandel_special999/components/home_page.dart';
 import 'package:frikandel_special999/components/login_page.dart';
 import 'package:frikandel_special999/components/main_page.dart';
-import 'firebase_options.dart'; // Importeer de Firebase-opties
+import 'package:frikandel_special999/components/new_post_page.dart';
+import 'package:frikandel_special999/components/profile_page.dart';
+import 'package:frikandel_special999/firebase_options.dart';
 
 import 'singleton.dart'; // Importeer de Singleton-klasse
 
@@ -13,7 +16,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Roep createDB aan om de database te initialiseren
+  // Initialiseer de database
   SettingsSingleton().createDB();
 
   runApp(const MyApp());
@@ -29,11 +32,24 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/home', // Start de app op de home pagina
+      initialRoute: '/', // Start de app op de LoginPage
       routes: {
+        '/': (context) => const LoginPage(), // Start met de LoginPage
+        '/main': (context) =>
+            const MainPage(), // Navigeer naar MainPage na inloggen
         '/home': (context) => const HomePage(),
         '/login': (context) => const LoginPage(),
-        '/main': (context) => const MainPage(),
+        '/new_post': (context) => const NewPostPage(),
+        '/profile': (context) => ProfilePage(
+              callback: () {
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
+        '/feed': (context) => FeedPage(
+              callback: () {
+                Navigator.pushReplacementNamed(context, '/feed');
+              },
+            ),
       },
     );
   }
