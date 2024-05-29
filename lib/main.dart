@@ -6,9 +6,9 @@ import 'package:frikandel_special999/components/login_page.dart';
 import 'package:frikandel_special999/components/main_page.dart';
 import 'package:frikandel_special999/components/new_post_page.dart';
 import 'package:frikandel_special999/components/profile_page.dart';
+import 'package:frikandel_special999/components/register_page.dart'; // Voeg dit toe
 import 'package:frikandel_special999/firebase_options.dart';
-
-import 'singleton.dart'; // Importeer de Singleton-klasse
+import 'singleton.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +16,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialiseer de database
   SettingsSingleton().createDB();
 
   runApp(const MyApp());
@@ -39,6 +38,7 @@ class MyApp extends StatelessWidget {
             const MainPage(), // Navigeer naar MainPage na inloggen
         '/home': (context) => const HomePage(),
         '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(), // Voeg dit toe
         '/new_post': (context) => const NewPostPage(),
         '/profile': (context) => ProfilePage(
               callback: () {
