@@ -8,14 +8,6 @@ class FeedPage extends StatelessWidget {
 
   FeedPage({super.key, required this.callback});
 
-  void _fetchPostFromFirestore() async {
-    final QuerySnapshot<Map<String, dynamic>> snapshot =
-        await _firestore.collection('posts').get();
-    final List<Post> posts = snapshot.docs
-        .map((doc) => Post.fromFirestore(doc.data()))
-        .toList(growable: false);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +40,18 @@ class FeedPage extends StatelessWidget {
               final post = posts[index];
               return Card(
                 child: ListTile(
-                  title: Text(post.text),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        post.username,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(post.text),
+                    ],
+                  ),
                   leading: post.imageUrl.isNotEmpty
                       ? Image.network(
                           post.imageUrl,

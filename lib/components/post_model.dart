@@ -5,22 +5,20 @@ class Post {
   final String text;
   final String imageUrl;
   final DateTime timestamp;
-  final String userId; // Voeg dit veld toe
 
-  Post(
-      {required this.username,
-      required this.text,
-      required this.imageUrl,
-      required this.timestamp,
-      required this.userId});
+  Post({
+    required this.username,
+    required this.text,
+    required this.imageUrl,
+    required this.timestamp,
+  });
 
   factory Post.fromFirestore(Map<String, dynamic> data) {
     return Post(
-      username: data['username'] ?? '',
+      username: data['username'] ?? 'Unknown',
       text: data['text'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
       timestamp: (data['timestamp'] as Timestamp).toDate(),
-      userId: data['userId'] ?? '', // Voeg dit veld toe
     );
   }
 }
