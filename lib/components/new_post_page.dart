@@ -71,7 +71,7 @@ class _NewPostPageState extends State<NewPostPage> {
       }
 
       // Haal de gebruikersnaam op
-      String username = (userDoc.data() as Map<String, dynamic>)['username'];
+      String username = userDoc['username'];
       print('Gebruikersnaam: $username');
 
       print('Bezig met het opslaan van de post in Firestore...');
