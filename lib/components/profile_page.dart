@@ -19,16 +19,37 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _fetchUsername();
+    _fetchUserData();
   }
 
-  Future<void> _fetchUsername() async {
+  Future<void> _fetchUserData() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(user.uid).get();
+      try {
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          print('Gebruikersdocument gevonden: ${userDoc.data()}');
+          var data = userDoc.data() as Map<String, dynamic>;
+          setState(() {
+            username = data['username'] ?? 'No Username';
+          });
+        } else {
+          print('Gebruikersdocument niet gevonden');
+          setState(() {
+            username = 'Unknown User';
+          });
+        }
+      } catch (e) {
+        print('Fout bij het ophalen van gebruikersgegevens: $e');
+        setState(() {
+          username = 'Error';
+        });
+      }
+    } else {
+      print('Geen gebruiker ingelogd');
       setState(() {
-        username = userDoc['username'];
+        username = 'No User';
       });
     }
   }
