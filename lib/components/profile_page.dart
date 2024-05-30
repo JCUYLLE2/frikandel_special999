@@ -40,10 +40,11 @@ class _ProfilePageState extends State<ProfilePage> {
         if (userDoc.exists) {
           print('Gebruikersdocument gevonden: ${userDoc.data()}');
           setState(() {
-            username = (userDoc.data() as Map<String, dynamic>)?['username'] ??
-                'No Username';
-            profileImageUrl =
-                (userDoc.data() as Map<String, dynamic>)?['profileImageUrl'];
+            final data = userDoc.data() as Map<String, dynamic>;
+            username = data['username'] ?? 'No Username';
+            profileImageUrl = data['profileImageUrl'];
+            age = data['age'] ?? '...';
+            city = data['city'] ?? '...';
           });
         } else {
           print('Gebruikersdocument niet gevonden');
