@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({Key? key}) : super(key: key);
@@ -71,11 +71,12 @@ class _NewPostPageState extends State<NewPostPage> {
       }
 
       // Haal de gebruikersnaam op
-      String username = userDoc['username'];
+      String username = (userDoc.data() as Map<String, dynamic>)['username'];
       print('Gebruikersnaam: $username');
 
       print('Bezig met het opslaan van de post in Firestore...');
       await FirebaseFirestore.instance.collection("posts").add({
+        'userId': currentUser.uid, // Voeg de userId toe
         'text': _postController.text,
         'imageUrl': imageUrl,
         'timestamp': Timestamp.now(),
