@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart'; // Voeg deze import toe voor datumformattering
 import 'package:frikandel_special999/components/post_model.dart';
 
 class FeedPage extends StatelessWidget {
@@ -47,16 +48,29 @@ class FeedPage extends StatelessWidget {
                         post.username,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          fontSize: 16, // Vergroot de tekstgrootte indien nodig
                         ),
                       ),
+                      Text(
+                        DateFormat('dd-MM-yyyy HH:mm').format(
+                            post.timestamp), // Verander dit naar post.timestamp
+                        style: TextStyle(
+                          fontSize: 12, // Maak de tekstgrootte kleiner
+                          color: Colors
+                              .grey, // Voeg een grijze kleur toe voor contrast
+                        ),
+                      ),
+                      SizedBox(
+                          height:
+                              8.0), // Voeg wat ruimte toe tussen de timestamp en de tekst
                       Text(post.text),
                     ],
                   ),
                   leading: post.imageUrl.isNotEmpty
                       ? Image.network(
                           post.imageUrl,
-                          width: 50,
-                          height: 50,
+                          width: 100, // Vergroot de breedte van de afbeelding
+                          height: 100, // Vergroot de hoogte van de afbeelding
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, progress) {
                             if (progress == null) return child;
@@ -75,7 +89,6 @@ class FeedPage extends StatelessWidget {
                           },
                         )
                       : const Icon(Icons.image_not_supported),
-                  subtitle: Text(post.timestamp.toString()),
                 ),
               );
             },

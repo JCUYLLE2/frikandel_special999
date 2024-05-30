@@ -1,24 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Post {
-  final String username;
   final String text;
   final String imageUrl;
-  final DateTime timestamp;
+  final DateTime timestamp; // Verander naar DateTime
+  final String username;
 
   Post({
-    required this.username,
     required this.text,
     required this.imageUrl,
     required this.timestamp,
+    required this.username,
   });
 
   factory Post.fromFirestore(Map<String, dynamic> data) {
     return Post(
-      username: data['username'] ?? 'Unknown',
       text: data['text'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp).toDate(),
+      timestamp: (data['timestamp'] as Timestamp)
+          .toDate(), // Converteer Timestamp naar DateTime
+      username: data['username'] ?? '',
     );
   }
 }
