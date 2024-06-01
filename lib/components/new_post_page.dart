@@ -14,6 +14,8 @@ class NewPostPage extends StatefulWidget {
 
 class _NewPostPageState extends State<NewPostPage> {
   final TextEditingController _postController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   Uint8List? _imageData;
   final ImagePicker _picker = ImagePicker();
   bool _isSubmitting = false;
@@ -22,6 +24,8 @@ class _NewPostPageState extends State<NewPostPage> {
   @override
   void dispose() {
     _postController.dispose();
+    _titleController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -77,7 +81,9 @@ class _NewPostPageState extends State<NewPostPage> {
       print('Bezig met het opslaan van de post in Firestore...');
       await FirebaseFirestore.instance.collection("posts").add({
         'userId': currentUser.uid, // Voeg de userId toe
-        'text': _postController.text,
+        'title': _titleController.text, // Voeg de titel toe
+        'text': _postController.text, // Gebruik dit als de tekst van de post
+        'description': _descriptionController.text, // Voeg de beschrijving toe
         'imageUrl': imageUrl,
         'timestamp': Timestamp.now(),
         'username': username, // Voeg dit veld toe
@@ -85,8 +91,9 @@ class _NewPostPageState extends State<NewPostPage> {
       print('Post succesvol ingediend');
 
       Navigator.pushReplacementNamed(context, '/main');
-    } catch (error) {
+    } catch (error, stackTrace) {
       print('Fout bij het indienen van de post: $error');
+      print('Stack trace: $stackTrace');
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -111,13 +118,17 @@ class _NewPostPageState extends State<NewPostPage> {
   }
 
   Future<Uint8List?> pickImage({required ImageSource source}) async {
-    final XFile? file = await _picker.pickImage(
-      source: source,
-      imageQuality: 90,
-    );
+    try {
+      final XFile? file = await _picker.pickImage(
+        source: source,
+        imageQuality: 90,
+      );
 
-    if (file != null) {
-      return await file.readAsBytes();
+      if (file != null) {
+        return await file.readAsBytes();
+      }
+    } catch (error) {
+      print('Fout bij het kiezen van een afbeelding: $error');
     }
     return null;
   }
@@ -173,9 +184,20 @@ class _NewPostPageState extends State<NewPostPage> {
               child: Text('Neem een afbeelding'),
             ),
             TextField(
+              controller: _titleController,
+              decoration: InputDecoration(labelText: 'Titel'),
+            ),
+            TextField(
               controller: _postController,
-              decoration: InputDecoration(labelText: 'Wat wil je delen?'),
+              decoration: InputDecoration(labelText: 'Tekst'),
               maxLines: 3,
+            ),
+            TextField(
+              controller: _descriptionController,
+              decoration:
+                  InputDecoration(labelText: 'Beschrijving of URL/Recept'),
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
             ),
             ElevatedButton(
               onPressed: _isSubmitting ? null : _submitPost,

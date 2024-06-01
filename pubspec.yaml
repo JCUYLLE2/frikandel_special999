@@ -18,6 +18,7 @@ dependencies:
   permission_handler: ^10.0.0
   image: ^3.0.1
   intl: any
+  url_launcher: any
 
 dev_dependencies:
   flutter_test:

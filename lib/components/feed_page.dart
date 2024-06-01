@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:frikandel_special999/components/post_model.dart';
+import 'detail_page.dart';
 
 class FeedPage extends StatefulWidget {
   final VoidCallback callback;
@@ -68,22 +69,18 @@ class _FeedPageState extends State<FeedPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Toon een laadindicator als de data nog geladen wordt
             print('Waiting for data...');
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            // Toon een foutmelding als er een fout is opgetreden
             print('Error: ${snapshot.error}');
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            // Toon een bericht als er geen data beschikbaar is
             print('No data available');
             return const Center(child: Text('Geen posts beschikbaar'));
           }
 
-          // Maak een lijst van Post-objecten van de Firestore-documenten
           final posts = snapshot.data!.docs.map((doc) {
             print('Post document gevonden: ${doc.data()}');
             return Post.fromFirestore(doc.data() as Map<String, dynamic>);
@@ -118,79 +115,118 @@ class _FeedPageState extends State<FeedPage> {
 
   Future<List<Post>> _fetchProfileImages(List<Post> posts) async {
     for (var post in posts) {
-      try {
-        DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(post.userId).get();
-        if (userDoc.exists) {
-          print('Gebruikersdocument gevonden: ${userDoc.data()}');
-          post.setProfileImageUrl(
-              (userDoc.data() as Map<String, dynamic>)['profileImageUrl'] ??
-                  '');
-        } else {
-          print('Gebruikersdocument niet gevonden voor userId: ${post.userId}');
+      if (post.userId.isNotEmpty) {
+        try {
+          DocumentSnapshot userDoc =
+              await _firestore.collection('users').doc(post.userId).get();
+          if (userDoc.exists) {
+            print('Gebruikersdocument gevonden: ${userDoc.data()}');
+            post.setProfileImageUrl(
+                (userDoc.data() as Map<String, dynamic>)['profileImageUrl'] ??
+                    '');
+          } else {
+            print(
+                'Gebruikersdocument niet gevonden voor userId: ${post.userId}');
+          }
+        } catch (e) {
+          print('Fout bij het ophalen van gebruikersgegevens: $e');
         }
-      } catch (e) {
-        print('Fout bij het ophalen van gebruikersgegevens: $e');
       }
     }
     return posts;
   }
 
   Widget _buildPostCard(Post post) {
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          radius: 30,
-          backgroundImage: post.profileImageUrl.isNotEmpty
-              ? NetworkImage(post.profileImageUrl)
-              : null,
-          child: post.profileImageUrl.isEmpty
-              ? Icon(Icons.person, size: 30, color: Colors.grey)
-              : null,
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              post.username,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            Text(
-              DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 8.0),
-            Text(post.text),
-          ],
-        ),
-        trailing: post.imageUrl.isNotEmpty
-            ? Image.network(
-                post.imageUrl,
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: progress.expectedTotalBytes != null
-                          ? progress.cumulativeBytesLoaded /
-                              progress.expectedTotalBytes!
-                          : null,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(post: post),
+          ),
+        );
+      },
+      child: Card(
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 35,
+                    backgroundImage: post.profileImageUrl.isNotEmpty
+                        ? NetworkImage(post.profileImageUrl)
+                        : null,
+                    child: post.profileImageUrl.isEmpty
+                        ? Icon(Icons.person, size: 35, color: Colors.grey)
+                        : null,
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          post.username,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          post.title,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(Icons.broken_image, color: Colors.red);
-                },
-              )
-            : const Icon(Icons.image_not_supported),
+                  ),
+                  SizedBox(width: 16),
+                  post.imageUrl.isNotEmpty
+                      ? Image.network(
+                          post.imageUrl,
+                          width: 140,
+                          height: 140,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    "Lees meer",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward,
+                    color: Colors.blue,
+                    size: 12,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
