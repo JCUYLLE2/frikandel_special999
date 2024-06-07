@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
       print('Fout bij inloggen: $e');
       if (e is FirebaseAuthException && e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Unknown user, please register first'),
           ),
         );
@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Card(
                 elevation: 4.0,
-                margin: EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
+                margin: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Card(
                 elevation: 4.0,
-                margin: EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
+                margin: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -89,34 +89,34 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 24.0),
+              const SizedBox(height: 24.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
                     onPressed: _login,
-                    child: const Text('Log In'),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           horizontal: 32.0, vertical: 12.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
+                    child: const Text('Log In'),
                   ),
-                  SizedBox(width: 16.0),
+                  const SizedBox(width: 16.0),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/register');
                     },
-                    child: const Text('Register'),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           horizontal: 32.0, vertical: 12.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
+                    child: const Text('Register'),
                   ),
                 ],
               ),

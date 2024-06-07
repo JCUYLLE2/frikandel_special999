@@ -1,35 +1,47 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Post {
+  final String id; // Add this field
   final String username;
-  final String title; // Voeg dit veld toe
+  final String title;
   final String text;
-  final String description; // Voeg dit veld toe
+  final String description;
   final String imageUrl;
   final DateTime timestamp;
   final String userId;
   String profileImageUrl;
+  int likes;
+  List<String> likedBy;
 
   Post({
+    required this.id, // And this line
     required this.username,
-    required this.title, // Voeg dit veld toe
+    required this.title,
     required this.text,
-    required this.description, // Voeg dit veld toe
+    required this.description,
     required this.imageUrl,
     required this.timestamp,
     required this.userId,
     this.profileImageUrl = '',
+    this.likes = 0,
+    this.likedBy = const [],
   });
 
-  factory Post.fromFirestore(Map<String, dynamic> data) {
+  // Change Map<String, dynamic> data to DocumentSnapshot doc in the parameters.
+  factory Post.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
     return Post(
+      id: doc.id, // Add this line
       username: data['username'] ?? '',
-      title: data['title'] ?? '', // Voeg dit veld toe
+      title: data['title'] ?? '',
       text: data['text'] ?? '',
-      description: data['description'] ?? '', // Voeg dit veld toe
+      description: data['description'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
       timestamp: (data['timestamp'] as Timestamp).toDate(),
       userId: data['userId'] ?? '',
+      likes: data['likes'] ?? 0,
+      likedBy: List<String>.from(data['likedBy'] ?? []),
     );
   }
 

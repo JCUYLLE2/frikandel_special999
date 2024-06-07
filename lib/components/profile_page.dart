@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:frikandel_special999/components/detail_page.dart';
 import 'package:frikandel_special999/components/post_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +11,7 @@ import 'package:intl/intl.dart';
 class ProfilePage extends StatefulWidget {
   final VoidCallback callback;
 
-  const ProfilePage({Key? key, required this.callback}) : super(key: key);
+  const ProfilePage({super.key, required this.callback});
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -106,21 +107,21 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Bewerk Profiel'),
+          title: const Text('Bewerk Profiel'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: usernameController,
-                decoration: InputDecoration(labelText: 'Gebruikersnaam'),
+                decoration: const InputDecoration(labelText: 'Gebruikersnaam'),
               ),
               TextField(
                 controller: ageController,
-                decoration: InputDecoration(labelText: 'Leeftijd'),
+                decoration: const InputDecoration(labelText: 'Leeftijd'),
               ),
               TextField(
                 controller: cityController,
-                decoration: InputDecoration(labelText: 'Woonplaats'),
+                decoration: const InputDecoration(labelText: 'Woonplaats'),
               ),
             ],
           ),
@@ -129,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Annuleren'),
+              child: const Text('Annuleren'),
             ),
             TextButton(
               onPressed: () async {
@@ -148,7 +149,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 }
                 Navigator.of(context).pop();
               },
-              child: Text('Opslaan'),
+              child: const Text('Opslaan'),
             ),
           ],
         );
@@ -161,222 +162,25 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF235d3a),
-                  Color(0xFF235d3a).withOpacity(0.8),
-                  Color(0xFF235d3a).withOpacity(0.6),
-                  Color(0xFF235d3a).withOpacity(0.4),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
+          _buildBackground(),
           SafeArea(
             child: Column(
               children: [
-                SizedBox(height: 20),
-                CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Colors.white,
-                  child: CircleAvatar(
-                    radius: 55,
-                    backgroundImage: profileImageUrl != null
-                        ? NetworkImage(profileImageUrl!)
-                        : null,
-                    child: profileImageUrl == null
-                        ? Icon(Icons.person, size: 55, color: Colors.grey)
-                        : null,
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  username,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _uploadProfileImage,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Color(0xFF235d3a),
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: Text('Upload Profielfoto'),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Leeftijd: $age',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Woonplaats: $city',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _editProfile,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Color(0xFF235d3a),
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: Text('Bewerk Profiel'),
-                ),
-                SizedBox(height: 20),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Jouw Posts',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Expanded(
-                          child: StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('posts')
-                                .where('userId',
-                                    isEqualTo: _auth.currentUser?.uid)
-                                .orderBy('timestamp', descending: true)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              }
-                              if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('Error: ${snapshot.error}'));
-                              }
-                              if (!snapshot.hasData ||
-                                  snapshot.data!.docs.isEmpty) {
-                                return Center(
-                                    child: Text('Geen posts beschikbaar'));
-                              }
-
-                              final posts = snapshot.data!.docs.map((doc) {
-                                return Post.fromFirestore(
-                                    doc.data() as Map<String, dynamic>);
-                              }).toList();
-
-                              return ListView.builder(
-                                itemCount: posts.length,
-                                itemBuilder: (context, index) {
-                                  final post = posts[index];
-                                  return Card(
-                                    child: ListTile(
-                                      title: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            post.username,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          Text(
-                                            DateFormat('dd-MM-yyyy HH:mm')
-                                                .format(post.timestamp),
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          SizedBox(height: 8.0),
-                                          Text(post.text),
-                                        ],
-                                      ),
-                                      leading: post.imageUrl.isNotEmpty
-                                          ? Image.network(
-                                              post.imageUrl,
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.cover,
-                                              loadingBuilder:
-                                                  (context, child, progress) {
-                                                if (progress == null)
-                                                  return child;
-                                                return Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    value: progress
-                                                                .expectedTotalBytes !=
-                                                            null
-                                                        ? progress
-                                                                .cumulativeBytesLoaded /
-                                                            progress
-                                                                .expectedTotalBytes!
-                                                        : null,
-                                                  ),
-                                                );
-                                              },
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                return const Icon(
-                                                    Icons.broken_image,
-                                                    color: Colors.red);
-                                              },
-                                            )
-                                          : const Icon(
-                                              Icons.image_not_supported),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: ElevatedButton(
-                    onPressed: widget.callback,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.redAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text('Log Out'),
-                  ),
-                ),
+                const SizedBox(height: 20),
+                _buildProfileImage(),
+                const SizedBox(height: 20),
+                _buildUsername(),
+                const SizedBox(height: 20),
+                _buildUploadButton(),
+                const SizedBox(height: 20),
+                _buildAge(),
+                const SizedBox(height: 10),
+                _buildCity(),
+                const SizedBox(height: 20),
+                _buildEditButton(),
+                const SizedBox(height: 20),
+                _buildPosts(),
+                _buildLogoutButton(),
               ],
             ),
           ),
@@ -384,4 +188,265 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-}
+
+  Widget _buildBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF235d3a),
+            const Color(0xFF235d3a).withOpacity(0.8),
+            const Color(0xFF235d3a).withOpacity(0.6),
+            const Color(0xFF235d3a).withOpacity(0.4),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    return CircleAvatar(
+      radius: 60,
+      backgroundColor: Colors.white,
+      child: CircleAvatar(
+        radius: 55,
+        backgroundImage:
+            profileImageUrl != null ? NetworkImage(profileImageUrl!) : null,
+        child: profileImageUrl == null
+            ? const Icon(Icons.person, size: 55, color: Colors.grey)
+            : null,
+      ),
+    );
+  }
+
+  Widget _buildUsername() {
+    return Text(
+      username,
+      style: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildUploadButton() {
+    return ElevatedButton(
+      onPressed: _uploadProfileImage,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: const Color(0xFF235d3a),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+      ),
+      child: const Text('Upload Profielfoto'),
+    );
+  }
+
+  Widget _buildAge() {
+    return Text(
+      'Leeftijd: $age',
+      style: const TextStyle(
+        fontSize: 18,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildCity() {
+    return Text(
+      'Woonplaats: $city',
+      style: const TextStyle(
+        fontSize: 18,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildEditButton() {
+    return ElevatedButton(
+      onPressed: _editProfile,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: const Color(0xFF235d3a),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+      ),
+      child: const Text('Bewerk Profiel'),
+    );
+  }
+
+  Widget _buildPosts() {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+          ),
+        ),
+        child: Column(
+          children: [
+            const Text(
+              'Jouw Posts',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('posts')
+                    .where('userId', isEqualTo: _auth.currentUser?.uid)
+                    .orderBy('timestamp', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text('Geen posts beschikbaar'));
+                  }
+
+                  final posts = snapshot.data!.docs.map((doc) {
+                    return Post.fromFirestore(doc as DocumentSnapshot<Object?>);
+                  }).toList();
+
+                  return ListView.builder(
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      final post = posts[index];
+                      return _buildPostCard(post);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPostCard(Post post) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(post: post),
+          ),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 35,
+                    backgroundImage: post.profileImageUrl.isNotEmpty
+                        ? NetworkImage(post.profileImageUrl)
+                        : null,
+                    child: post.profileImageUrl.isEmpty
+                        ? const Icon(Icons.person, size: 35, color: Colors.grey)
+                        : null,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          post.username,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          post.title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  post.imageUrl.isNotEmpty
+                      ? Image.network(
+                          post.imageUrl,
+                          width: 140,
+                          height: 140,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Lees meer",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_forward,
+                    color: Colors.blue,
+                    size: 12,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: ElevatedButton(
+        onPressed: widget.callback,
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.redAccent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        child: const Text('Log Out'),
+      ),
+    );
+  } // Add this line
+} //

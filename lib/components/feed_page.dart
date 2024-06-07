@@ -3,11 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:frikandel_special999/components/post_model.dart';
 import 'detail_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FeedPage extends StatefulWidget {
   final VoidCallback callback;
 
-  FeedPage({Key? key, required this.callback}) : super(key: key);
+  const FeedPage({super.key, required this.callback});
 
   @override
   _FeedPageState createState() => _FeedPageState();
@@ -15,6 +16,7 @@ class FeedPage extends StatefulWidget {
 
 class _FeedPageState extends State<FeedPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +42,10 @@ class _FeedPageState extends State<FeedPage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF235d3a),
-            Color(0xFF235d3a).withOpacity(0.8),
-            Color(0xFF235d3a).withOpacity(0.6),
-            Color(0xFF235d3a).withOpacity(0.4),
+            const Color(0xFF235d3a),
+            const Color(0xFF235d3a).withOpacity(0.8),
+            const Color(0xFF235d3a).withOpacity(0.6),
+            const Color(0xFF235d3a).withOpacity(0.4),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -69,21 +71,14 @@ class _FeedPageState extends State<FeedPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            print('Waiting for data...');
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError) {
-            print('Error: ${snapshot.error}');
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            print('No data available');
             return const Center(child: Text('Geen posts beschikbaar'));
           }
 
           final posts = snapshot.data!.docs.map((doc) {
-            print('Post document gevonden: ${doc.data()}');
-            return Post.fromFirestore(doc.data() as Map<String, dynamic>);
+            return Post.fromFirestore(doc);
           }).toList();
 
           return FutureBuilder<List<Post>>(
@@ -92,17 +87,11 @@ class _FeedPageState extends State<FeedPage> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
-              if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              }
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('Geen posts beschikbaar'));
-              }
 
               return ListView.builder(
-                itemCount: snapshot.data!.length,
+                itemCount: posts.length,
                 itemBuilder: (context, index) {
-                  final post = snapshot.data![index];
+                  final post = posts[index];
                   return _buildPostCard(post);
                 },
               );
@@ -116,24 +105,38 @@ class _FeedPageState extends State<FeedPage> {
   Future<List<Post>> _fetchProfileImages(List<Post> posts) async {
     for (var post in posts) {
       if (post.userId.isNotEmpty) {
-        try {
-          DocumentSnapshot userDoc =
-              await _firestore.collection('users').doc(post.userId).get();
-          if (userDoc.exists) {
-            print('Gebruikersdocument gevonden: ${userDoc.data()}');
-            post.setProfileImageUrl(
-                (userDoc.data() as Map<String, dynamic>)['profileImageUrl'] ??
-                    '');
-          } else {
-            print(
-                'Gebruikersdocument niet gevonden voor userId: ${post.userId}');
-          }
-        } catch (e) {
-          print('Fout bij het ophalen van gebruikersgegevens: $e');
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(post.userId).get();
+        if (userDoc.exists) {
+          post.setProfileImageUrl(
+              (userDoc.data() as Map<String, dynamic>)['profileImageUrl'] ??
+                  '');
         }
       }
     }
     return posts;
+  }
+
+  Future<void> _toggleLike(Post post) async {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      return;
+    }
+    final isLiked = post.likedBy.contains(user.uid);
+    final newLikes = isLiked ? post.likes - 1 : post.likes + 1;
+    final newLikedBy = isLiked
+        ? post.likedBy.where((id) => id != user.uid).toList()
+        : [...post.likedBy, user.uid];
+
+    await _firestore.collection('posts').doc(post.id).update({
+      'likes': newLikes,
+      'likedBy': newLikedBy,
+    });
+    setState(() {
+      post.likes = newLikes;
+      post.likedBy = newLikedBy;
+    });
   }
 
   Widget _buildPostCard(Post post) {
@@ -147,7 +150,7 @@ class _FeedPageState extends State<FeedPage> {
         );
       },
       child: Card(
-        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
@@ -162,31 +165,31 @@ class _FeedPageState extends State<FeedPage> {
                         ? NetworkImage(post.profileImageUrl)
                         : null,
                     child: post.profileImageUrl.isEmpty
-                        ? Icon(Icons.person, size: 35, color: Colors.grey)
+                        ? const Icon(Icons.person, size: 35, color: Colors.grey)
                         : null,
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           post.username,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         Text(
                           DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
                           ),
                         ),
                         Text(
                           post.title,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -194,7 +197,7 @@ class _FeedPageState extends State<FeedPage> {
                       ],
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   post.imageUrl.isNotEmpty
                       ? Image.network(
                           post.imageUrl,
@@ -205,22 +208,42 @@ class _FeedPageState extends State<FeedPage> {
                       : Container(),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "Lees meer",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          post.likedBy.contains(_auth.currentUser?.uid)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: post.likedBy.contains(_auth.currentUser?.uid)
+                              ? Colors.red
+                              : Colors.grey,
+                        ),
+                        onPressed: () => _toggleLike(post),
+                      ),
+                      Text('${post.likes} likes'),
+                    ],
                   ),
-                  Icon(
-                    Icons.arrow_forward,
-                    color: Colors.blue,
-                    size: 12,
+                  const Row(
+                    children: [
+                      Text(
+                        "Lees meer",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward,
+                        color: Colors.blue,
+                        size: 12,
+                      ),
+                    ],
                   ),
                 ],
               ),

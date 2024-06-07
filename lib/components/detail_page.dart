@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 class DetailPage extends StatelessWidget {
   final Post post;
 
-  const DetailPage({Key? key, required this.post}) : super(key: key);
+  const DetailPage({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -32,25 +32,25 @@ class DetailPage extends StatelessWidget {
                         width: double.infinity,
                       ),
                     ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Text(
                     post.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Text(
                     post.text,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 16.0),
-                  Text(
+                  const SizedBox(height: 16.0),
+                  const Text(
                     'Ontdek het recept hier:',
                     style: TextStyle(
                       fontSize: 18,
@@ -58,7 +58,7 @@ class DetailPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: ElevatedButton(
@@ -68,7 +68,7 @@ class DetailPage extends StatelessWidget {
                           await launch(url);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                            const SnackBar(
                               content: Text('Kan de URL niet openen'),
                             ),
                           );
@@ -76,14 +76,14 @@ class DetailPage extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: Color(0xFF1B5E20),
+                        backgroundColor: const Color(0xFF1B5E20),
                         padding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: Text('Open URL'),
+                      child: const Text('Open URL'),
                     ),
                   ),
                 ],
@@ -100,10 +100,10 @@ class DetailPage extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF1B5E20), // Donkerder groen
-            Color(0xFF1B5E20).withOpacity(0.8),
-            Color(0xFF1B5E20).withOpacity(0.6),
-            Color(0xFF1B5E20).withOpacity(0.4),
+            const Color(0xFF1B5E20), // Donkerder groen
+            const Color(0xFF1B5E20).withOpacity(0.8),
+            const Color(0xFF1B5E20).withOpacity(0.6),
+            const Color(0xFF1B5E20).withOpacity(0.4),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,

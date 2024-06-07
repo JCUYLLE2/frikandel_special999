@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 class NewPostPage extends StatefulWidget {
-  const NewPostPage({Key? key}) : super(key: key);
+  const NewPostPage({super.key});
 
   @override
   _NewPostPageState createState() => _NewPostPageState();
@@ -97,15 +97,15 @@ class _NewPostPageState extends State<NewPostPage> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Fout'),
-          content: Text(
+          title: const Text('Fout'),
+          content: const Text(
               'Er is een fout opgetreden bij het indienen van de post. Probeer het opnieuw.'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         ),
@@ -137,7 +137,7 @@ class _NewPostPageState extends State<NewPostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nieuwe Post'),
+        title: const Text('Nieuwe Post'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -146,7 +146,7 @@ class _NewPostPageState extends State<NewPostPage> {
           children: [
             if (_imageData != null)
               Container(
-                constraints: BoxConstraints(
+                constraints: const BoxConstraints(
                   maxHeight:
                       200, // Pas deze waarde aan om de maximale hoogte te beperken
                 ),
@@ -167,7 +167,7 @@ class _NewPostPageState extends State<NewPostPage> {
                         });
                       }
                     },
-              child: Text('Kies een afbeelding uit galerij'),
+              child: const Text('Kies een afbeelding uit galerij'),
             ),
             ElevatedButton(
               onPressed: _isSubmitting
@@ -181,28 +181,28 @@ class _NewPostPageState extends State<NewPostPage> {
                         });
                       }
                     },
-              child: Text('Neem een afbeelding'),
+              child: const Text('Neem een afbeelding'),
             ),
             TextField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: 'Titel'),
+              decoration: const InputDecoration(labelText: 'Titel'),
             ),
             TextField(
               controller: _postController,
-              decoration: InputDecoration(labelText: 'Tekst'),
+              decoration: const InputDecoration(labelText: 'Tekst'),
               maxLines: 3,
             ),
             TextField(
               controller: _descriptionController,
               decoration:
-                  InputDecoration(labelText: 'Beschrijving of URL/Recept'),
+                  const InputDecoration(labelText: 'Beschrijving of URL/Recept'),
               maxLines: null,
               keyboardType: TextInputType.multiline,
             ),
             ElevatedButton(
               onPressed: _isSubmitting ? null : _submitPost,
               child:
-                  _isSubmitting ? CircularProgressIndicator() : Text('Posten'),
+                  _isSubmitting ? const CircularProgressIndicator() : const Text('Posten'),
             ),
           ],
         ),

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -50,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               Card(
                 elevation: 4.0,
-                margin: EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
+                margin: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -67,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               Card(
                 elevation: 4.0,
-                margin: EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
+                margin: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -84,7 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               Card(
                 elevation: 4.0,
-                margin: EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
+                margin: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -100,7 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 24.0),
+              const SizedBox(height: 24.0),
               ElevatedButton(
                 onPressed: _register,
                 child: const Text('Register'),

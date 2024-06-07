@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frikandel_special999/components/feed_page.dart';
-import 'home_page.dart'; // Importeer de HomePage
+// Importeer de HomePage
 import 'profile_page.dart'; // Importeer de ProfilePage
 import 'new_post_page.dart'; // Importeer de NewPostPage
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  const MainPage({super.key});
 
   @override
   _MainPageState createState() => _MainPageState();
