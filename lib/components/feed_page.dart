@@ -88,6 +88,10 @@ class _FeedPageState extends State<FeedPage> {
                 return const Center(child: CircularProgressIndicator());
               }
 
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text('Geen posts beschikbaar'));
+              }
+
               return ListView.builder(
                 itemCount: posts.length,
                 itemBuilder: (context, index) {
@@ -108,9 +112,8 @@ class _FeedPageState extends State<FeedPage> {
         DocumentSnapshot userDoc =
             await _firestore.collection('users').doc(post.userId).get();
         if (userDoc.exists) {
-          post.setProfileImageUrl(
-              (userDoc.data() as Map<String, dynamic>)['profileImageUrl'] ??
-                  '');
+          final userData = userDoc.data() as Map<String, dynamic>;
+          post.setProfileImageUrl(userData['profileImageUrl'] ?? '');
         }
       }
     }
@@ -181,7 +184,8 @@ class _FeedPageState extends State<FeedPage> {
                           ),
                         ),
                         Text(
-                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp),
+                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp
+                              .toDate()), // Convert Timestamp to DateTime
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
@@ -194,18 +198,47 @@ class _FeedPageState extends State<FeedPage> {
                             fontSize: 16,
                           ),
                         ),
+                        Text(
+                          post.description,
+                          style: const TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 16),
-                  post.imageUrl.isNotEmpty
+                  post.imageUrls.isNotEmpty
                       ? Image.network(
-                          post.imageUrl,
+                          post.imageUrls.length > 0
+                              ? post.imageUrls[0]
+                              : '', // Ensure imageUrls is a list
                           width: 140,
                           height: 140,
                           fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.broken_image, size: 140);
+                          },
                         )
-                      : Container(),
+                      : Container(
+                          width: 140,
+                          height: 140,
+                          color: Colors.grey[200],
+                          child:
+                              Icon(Icons.image, size: 140, color: Colors.grey),
+                        ),
                 ],
               ),
               const SizedBox(height: 8),

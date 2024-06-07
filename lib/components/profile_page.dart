@@ -380,7 +380,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         Text(
-                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp),
+                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp
+                              .toDate()), // Convert Timestamp to DateTime
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
@@ -397,9 +398,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  post.imageUrl.isNotEmpty
+                  post.imageUrls.isNotEmpty
                       ? Image.network(
-                          post.imageUrl,
+                          post.imageUrls[
+                              0], // Gebruik de eerste URL uit de lijst
                           width: 140,
                           height: 140,
                           fit: BoxFit.cover,
@@ -448,5 +450,5 @@ class _ProfilePageState extends State<ProfilePage> {
         child: const Text('Log Out'),
       ),
     );
-  } // Add this line
-} //
+  }
+}

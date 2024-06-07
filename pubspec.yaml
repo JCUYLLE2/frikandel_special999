@@ -19,6 +19,7 @@ dependencies:
   image: ^3.0.1
   intl: any
   url_launcher: any
+  carousel_slider: ^4.0.0
 
 dev_dependencies:
   flutter_test:

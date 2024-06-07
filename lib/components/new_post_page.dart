@@ -1,6 +1,9 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({super.key});
@@ -13,9 +16,11 @@ class _NewPostPageState extends State<NewPostPage> {
   final TextEditingController _postController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  Uint8List? _imageData;
+  List<Uint8List> _imageDataList = [];
   final ImagePicker _picker = ImagePicker();
   bool _isSubmitting = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +38,28 @@ class _NewPostPageState extends State<NewPostPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (_imageData != null)
+                  if (_imageDataList.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.only(bottom: 20),
                       height: 200,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: DecorationImage(
-                          image: MemoryImage(_imageData!),
-                          fit: BoxFit.cover,
-                        ),
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _imageDataList.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
+                            width: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              image: DecorationImage(
+                                image: MemoryImage(_imageDataList[index]),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  const SizedBox(height: 20),
                   Center(
                     child: SizedBox(
                       width: 200, // Adjust the width as needed
@@ -53,11 +67,18 @@ class _NewPostPageState extends State<NewPostPage> {
                         onPressed: _isSubmitting
                             ? null
                             : () async {
-                                final Uint8List? imageData =
-                                    await pickImage(source: ImageSource.camera);
-                                if (imageData != null) {
+                                final List<XFile>? images =
+                                    await _picker.pickMultiImage(
+                                  imageQuality: 90,
+                                );
+                                if (images != null) {
+                                  List<Uint8List> imageDataList = [];
+                                  for (var image in images) {
+                                    imageDataList
+                                        .add(await image.readAsBytes());
+                                  }
                                   setState(() {
-                                    _imageData = imageData;
+                                    _imageDataList = imageDataList;
                                   });
                                 }
                               },
@@ -76,7 +97,7 @@ class _NewPostPageState extends State<NewPostPage> {
                   TextField(
                     controller: _titleController,
                     decoration: InputDecoration(
-                      labelText: 'Wat heb je gegeten?',
+                      labelText: 'Titel',
                       fillColor: Colors.grey[200], // Light gray fill
                       filled: true,
                       border: OutlineInputBorder(
@@ -88,7 +109,7 @@ class _NewPostPageState extends State<NewPostPage> {
                   TextField(
                     controller: _postController,
                     decoration: InputDecoration(
-                      labelText: 'Post hier je bereidingswijze',
+                      labelText: 'Tekst',
                       fillColor: Colors.grey[200],
                       filled: true,
                       border: OutlineInputBorder(
@@ -101,7 +122,7 @@ class _NewPostPageState extends State<NewPostPage> {
                   TextField(
                     controller: _descriptionController,
                     decoration: InputDecoration(
-                      labelText: 'Post hier de link van je recept',
+                      labelText: 'Beschrijving of URL/Recept',
                       fillColor: Colors.grey[200],
                       filled: true,
                       border: OutlineInputBorder(
@@ -156,24 +177,107 @@ class _NewPostPageState extends State<NewPostPage> {
     );
   }
 
-  Future<Uint8List?> pickImage({required ImageSource source}) async {
-    try {
-      final XFile? file = await _picker.pickImage(
-        source: source,
-        imageQuality: 90,
-      );
+  Future<void> _submitPost() async {
+    setState(() {
+      _isSubmitting = true;
+    });
 
-      if (file != null) {
-        return await file.readAsBytes();
-      }
-    } catch (error) {
-      print('Fout bij het kiezen van een afbeelding: $error');
+    final User? currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      setState(() {
+        _isSubmitting = false;
+      });
+      _showLoginRequiredDialog();
+      return;
     }
-    return null;
+
+    try {
+      List<String> imageUrls = [];
+      for (var imageData in _imageDataList) {
+        final Reference storageRef = FirebaseStorage.instance
+            .ref()
+            .child('post_images')
+            .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+        final UploadTask uploadTask = storageRef.putData(imageData);
+        final TaskSnapshot taskSnapshot =
+            await uploadTask.whenComplete(() => {});
+        final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+        imageUrls.add(downloadUrl);
+      }
+
+      final DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(currentUser.uid).get();
+
+      if (!userDoc.exists) {
+        throw 'User document does not exist';
+      }
+
+      final userData = userDoc.data() as Map<String, dynamic>;
+      final String username = userData['username'] ?? 'Unknown';
+      final String profileImageUrl = userData.containsKey('profileImageUrl')
+          ? userData['profileImageUrl']
+          : '';
+
+      await _firestore.collection("posts").add({
+        'userId': currentUser.uid,
+        'title': _titleController.text,
+        'text': _postController.text,
+        'description': _descriptionController.text,
+        'imageUrls': imageUrls,
+        'timestamp': Timestamp.now(),
+        'username': username,
+        'profileImageUrl': profileImageUrl,
+        'likes': 0,
+        'likedBy': [],
+      });
+
+      // Na het succesvol indienen van de post, navigeer naar de feedpagina
+      Navigator.pushReplacementNamed(context,
+          '/feed'); // Zorg ervoor dat '/feed' de juiste naam is voor je feedpagina route
+    } catch (error) {
+      print('Fout bij het indienen van de post: $error');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Fout'),
+          content: const Text(
+              'Er is een fout opgetreden bij het indienen van de post. Probeer het opnieuw.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
   }
 
-  Future<void> _submitPost() async {
-    // Existing submit logic here
+  void _showLoginRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Login Vereist'),
+        content: const Text(
+            'U moet ingelogd zijn om een nieuwe post te kunnen plaatsen.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context,
+                  '/login'); // Assuming you have a named route for the login page
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
