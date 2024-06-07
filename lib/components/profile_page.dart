@@ -401,7 +401,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   post.imageUrls.isNotEmpty
                       ? Image.network(
                           post.imageUrls[
-                              0], // Gebruik de eerste URL uit de lijst
+                              0], // Accessing the first image URL in the list
                           width: 140,
                           height: 140,
                           fit: BoxFit.cover,
@@ -450,5 +450,5 @@ class _ProfilePageState extends State<ProfilePage> {
         child: const Text('Log Out'),
       ),
     );
-  }
-}
+  } // Add this line
+} //

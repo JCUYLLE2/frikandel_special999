@@ -179,10 +179,13 @@ class _FeedPageState extends State<FeedPage> {
                         Text(
                           post.username,
                           style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 18, // Vergroot de tekstgrootte
+                            fontWeight:
+                                FontWeight.bold, // Maak de tekst vetgedrukt
+                            color: Color(0xFF235d3a), // Gebruik de groene kleur
                           ),
                         ),
+                        const SizedBox(height: 4),
                         Text(
                           DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp
                               .toDate()), // Convert Timestamp to DateTime
@@ -191,6 +194,7 @@ class _FeedPageState extends State<FeedPage> {
                             color: Colors.grey,
                           ),
                         ),
+                        const SizedBox(height: 4),
                         Text(
                           post.title,
                           style: const TextStyle(
@@ -210,9 +214,7 @@ class _FeedPageState extends State<FeedPage> {
                   const SizedBox(width: 16),
                   post.imageUrls.isNotEmpty
                       ? Image.network(
-                          post.imageUrls.length > 0
-                              ? post.imageUrls[0]
-                              : '', // Ensure imageUrls is a list
+                          post.imageUrls[0],
                           width: 140,
                           height: 140,
                           fit: BoxFit.cover,

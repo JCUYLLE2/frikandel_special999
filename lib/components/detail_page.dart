@@ -6,8 +6,9 @@ import 'dart:html' as html;
 
 class DetailPage extends StatelessWidget {
   final Post post;
+  final CarouselController _carouselController = CarouselController();
 
-  const DetailPage({Key? key, required this.post}) : super(key: key);
+  DetailPage({Key? key, required this.post}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +57,32 @@ class DetailPage extends StatelessWidget {
                               Center(
                                 child: Container(
                                   width: contentWidth,
-                                  child: _buildImageSlideshow(post.imageUrls),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      _buildImageSlideshow(post.imageUrls),
+                                      Positioned(
+                                        left: 0,
+                                        child: IconButton(
+                                          icon: Icon(Icons.arrow_back,
+                                              size: 30, color: Colors.white),
+                                          onPressed: () {
+                                            _carouselController.previousPage();
+                                          },
+                                        ),
+                                      ),
+                                      Positioned(
+                                        right: 0,
+                                        child: IconButton(
+                                          icon: Icon(Icons.arrow_forward,
+                                              size: 30, color: Colors.white),
+                                          onPressed: () {
+                                            _carouselController.nextPage();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -76,10 +102,18 @@ class DetailPage extends StatelessWidget {
                                     ],
                                   ),
                                   padding: const EdgeInsets.all(16.0),
-                                  child: Text(
-                                    post.text, // Post tekst hier weergeven
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxHeight:
+                                          300, // Pas de hoogte aan naar wens
+                                    ),
+                                    child: SingleChildScrollView(
+                                      child: Text(
+                                        post.text, // Post tekst hier weergeven
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -138,27 +172,35 @@ class DetailPage extends StatelessWidget {
 
   Widget _buildImageSlideshow(List<String> imageUrls) {
     if (imageUrls.isEmpty) {
+      print("Geen afbeeldingen beschikbaar");
       return Container();
     } else if (imageUrls.length == 1) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          imageUrls[0],
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: 300, // Pas de hoogte aan indien nodig
+      return Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Image.network(
+              imageUrls[0],
+            ),
+          ),
         ),
       );
     } else {
+      print("Aantal afbeeldingen in slideshow: ${imageUrls.length}");
       return CarouselSlider.builder(
+        carouselController: _carouselController,
         itemCount: imageUrls.length,
         itemBuilder: (context, index, realIdx) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              imageUrls[index],
-              fit: BoxFit.cover,
-              width: double.infinity,
+          return Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Image.network(
+                  imageUrls[index],
+                ),
+              ),
             ),
           );
         },
