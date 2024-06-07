@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewPostPage extends StatefulWidget {
-  const NewPostPage({super.key});
+  const NewPostPage({Key? key}) : super(key: key);
 
   @override
   _NewPostPageState createState() => _NewPostPageState();
@@ -21,6 +21,14 @@ class _NewPostPageState extends State<NewPostPage> {
   bool _isSubmitting = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String _postOrigin = 'Eigen Recept'; // Default value
+
+  void _togglePostOrigin() {
+    setState(() {
+      _postOrigin =
+          _postOrigin == 'Eigen Recept' ? 'Elders Gevonden' : 'Eigen Recept';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +142,49 @@ class _NewPostPageState extends State<NewPostPage> {
                   ),
                   const SizedBox(height: 20),
                   Center(
+                    child: ToggleButtons(
+                      isSelected: [
+                        _postOrigin == 'Eigen Recept',
+                        _postOrigin == 'Elders Gevonden',
+                      ],
+                      onPressed: (index) {
+                        _togglePostOrigin();
+                      },
+                      children: [
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Text(
+                            'Eigen Recept',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Text(
+                            'Elders Gevonden',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                      borderRadius: BorderRadius.circular(30),
+                      selectedColor: Colors.white,
+                      fillColor: const Color(0xFF235d3a),
+                      color: const Color(0xFF235d3a),
+                      borderColor: Colors.grey,
+                      borderWidth: 1.5,
+                      selectedBorderColor: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
                     child: SizedBox(
                       width: 200, // Adjust the width as needed
                       child: ElevatedButton(
@@ -229,6 +280,7 @@ class _NewPostPageState extends State<NewPostPage> {
         'profileImageUrl': profileImageUrl,
         'likes': 0,
         'likedBy': [],
+        'origin': _postOrigin, // Added post origin
       });
 
       // Na het succesvol indienen van de post, navigeer naar de feedpagina

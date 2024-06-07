@@ -12,6 +12,8 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> imageUrls = post.imageUrls;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(post.title),
@@ -60,27 +62,30 @@ class DetailPage extends StatelessWidget {
                                   child: Stack(
                                     alignment: Alignment.center,
                                     children: [
-                                      _buildImageSlideshow(post.imageUrls),
-                                      Positioned(
-                                        left: 0,
-                                        child: IconButton(
-                                          icon: Icon(Icons.arrow_back,
-                                              size: 30, color: Colors.white),
-                                          onPressed: () {
-                                            _carouselController.previousPage();
-                                          },
+                                      _buildImageSlideshow(imageUrls),
+                                      if (imageUrls.length > 1) ...[
+                                        Positioned(
+                                          left: 0,
+                                          child: IconButton(
+                                            icon: Icon(Icons.arrow_back,
+                                                size: 30, color: Colors.white),
+                                            onPressed: () {
+                                              _carouselController
+                                                  .previousPage();
+                                            },
+                                          ),
                                         ),
-                                      ),
-                                      Positioned(
-                                        right: 0,
-                                        child: IconButton(
-                                          icon: Icon(Icons.arrow_forward,
-                                              size: 30, color: Colors.white),
-                                          onPressed: () {
-                                            _carouselController.nextPage();
-                                          },
+                                        Positioned(
+                                          right: 0,
+                                          child: IconButton(
+                                            icon: Icon(Icons.arrow_forward,
+                                                size: 30, color: Colors.white),
+                                            onPressed: () {
+                                              _carouselController.nextPage();
+                                            },
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ],
                                   ),
                                 ),

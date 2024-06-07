@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class FeedPage extends StatefulWidget {
   final VoidCallback callback;
 
-  const FeedPage({super.key, required this.callback});
+  const FeedPage({Key? key, required this.callback}) : super(key: key);
 
   @override
   _FeedPageState createState() => _FeedPageState();
@@ -263,23 +263,7 @@ class _FeedPageState extends State<FeedPage> {
                       Text('${post.likes} likes'),
                     ],
                   ),
-                  const Row(
-                    children: [
-                      Text(
-                        "Lees meer",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: Colors.blue,
-                        size: 12,
-                      ),
-                    ],
-                  ),
+                  // Hier kun je het icoon toevoegen voor "Home made" of "Inspired"
                 ],
               ),
             ],

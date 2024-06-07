@@ -6,12 +6,13 @@ class Post {
   String username;
   String title;
   String description;
-  String text; // Add this line
+  String text;
   Timestamp timestamp;
   String profileImageUrl;
   int likes;
   List<String> likedBy;
   List<String> imageUrls;
+  String origin; // Add this line
 
   Post({
     required this.id,
@@ -19,12 +20,13 @@ class Post {
     required this.username,
     required this.title,
     required this.description,
-    required this.text, // Add this line
+    required this.text,
     required this.timestamp,
     this.profileImageUrl = '',
     required this.likes,
     required this.likedBy,
     required this.imageUrls,
+    required this.origin, // Add this line
   });
 
   factory Post.fromFirestore(DocumentSnapshot doc) {
@@ -41,12 +43,13 @@ class Post {
       username: data['username'] ?? '',
       title: data['title'] ?? '',
       description: data['description'] ?? '',
-      text: data['text'] ?? '', // Add this line
+      text: data['text'] ?? '',
       timestamp: data['timestamp'],
       profileImageUrl: data['profileImageUrl'] ?? '',
       likes: data['likes'] ?? 0,
       likedBy: List<String>.from(data['likedBy'] ?? []),
       imageUrls: imageUrls,
+      origin: data['origin'] ?? '', // Initialize origin attribute
     );
   }
 
