@@ -81,24 +81,11 @@ class _FeedPageState extends State<FeedPage> {
             return Post.fromFirestore(doc);
           }).toList();
 
-          return FutureBuilder<List<Post>>(
-            future: _fetchProfileImages(posts),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('Geen posts beschikbaar'));
-              }
-
-              return ListView.builder(
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  final post = posts[index];
-                  return _buildPostCard(post);
-                },
-              );
+          return ListView.builder(
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              final post = posts[index];
+              return _buildPostCard(post);
             },
           );
         },
@@ -113,7 +100,9 @@ class _FeedPageState extends State<FeedPage> {
             await _firestore.collection('users').doc(post.userId).get();
         if (userDoc.exists) {
           final userData = userDoc.data() as Map<String, dynamic>;
-          post.setProfileImageUrl(userData['profileImageUrl'] ?? '');
+          final profileImageUrl = userData['profileImageUrl'] ?? '';
+          // Update profileImageUrl in the Post object
+          post.profileImageUrl = profileImageUrl;
         }
       }
     }
@@ -139,6 +128,8 @@ class _FeedPageState extends State<FeedPage> {
     setState(() {
       post.likes = newLikes;
       post.likedBy = newLikedBy;
+      // Voeg hier een update toe voor de lijst met reacties
+      post.comments = post.comments;
     });
   }
 
@@ -179,16 +170,14 @@ class _FeedPageState extends State<FeedPage> {
                         Text(
                           post.username,
                           style: const TextStyle(
-                            fontSize: 18, // Vergroot de tekstgrootte
-                            fontWeight:
-                                FontWeight.bold, // Maak de tekst vetgedrukt
-                            color: Color(0xFF235d3a), // Gebruik de groene kleur
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF235d3a),
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp
-                              .toDate()), // Convert Timestamp to DateTime
+                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp),
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
@@ -263,7 +252,15 @@ class _FeedPageState extends State<FeedPage> {
                       Text('${post.likes} likes'),
                     ],
                   ),
-                  // Hier kun je het icoon toevoegen voor "Home made" of "Inspired"
+                  Row(
+                    children: [
+                      Icon(Icons.restaurant,
+                          color: Colors.grey), // Koks-icoontje
+                      SizedBox(width: 4),
+                      Text(
+                          'Recensies'), // Vervang het aantal reacties door het woord "Recensies"
+                    ],
+                  ),
                 ],
               ),
             ],

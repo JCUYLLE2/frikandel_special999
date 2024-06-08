@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 class ProfilePage extends StatefulWidget {
   final VoidCallback callback;
 
-  const ProfilePage({super.key, required this.callback});
+  const ProfilePage({Key? key, required this.callback}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -179,7 +179,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 20),
                 _buildEditButton(),
                 const SizedBox(height: 20),
-                _buildPosts(),
                 _buildLogoutButton(),
               ],
             ),
@@ -280,161 +279,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildPosts() {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
-        child: Column(
-          children: [
-            const Text(
-              'Jouw Posts',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('posts')
-                    .where('userId', isEqualTo: _auth.currentUser?.uid)
-                    .orderBy('timestamp', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(child: Text('Geen posts beschikbaar'));
-                  }
-
-                  final posts = snapshot.data!.docs.map((doc) {
-                    return Post.fromFirestore(doc as DocumentSnapshot<Object?>);
-                  }).toList();
-
-                  return ListView.builder(
-                    itemCount: posts.length,
-                    itemBuilder: (context, index) {
-                      final post = posts[index];
-                      return _buildPostCard(post);
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPostCard(Post post) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DetailPage(post: post),
-          ),
-        );
-      },
-      child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 35,
-                    backgroundImage: post.profileImageUrl.isNotEmpty
-                        ? NetworkImage(post.profileImageUrl)
-                        : null,
-                    child: post.profileImageUrl.isEmpty
-                        ? const Icon(Icons.person, size: 35, color: Colors.grey)
-                        : null,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          post.username,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          DateFormat('dd-MM-yyyy HH:mm').format(post.timestamp
-                              .toDate()), // Convert Timestamp to DateTime
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        Text(
-                          post.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  post.imageUrls.isNotEmpty
-                      ? Image.network(
-                          post.imageUrls[
-                              0], // Accessing the first image URL in the list
-                          width: 140,
-                          height: 140,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Lees meer",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  const Icon(
-                    Icons.arrow_forward,
-                    color: Colors.blue,
-                    size: 12,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildLogoutButton() {
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -451,4 +295,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   } // Add this line
-} //
+}

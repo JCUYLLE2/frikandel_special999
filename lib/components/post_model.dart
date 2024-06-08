@@ -1,59 +1,111 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class Comment {
+  String id;
+  String userId;
+  String username;
+  String profileImageUrl;
+  String text;
+  DateTime timestamp;
+
+  Comment({
+    required this.id,
+    required this.userId,
+    required this.username,
+    required this.profileImageUrl,
+    required this.text,
+    required this.timestamp,
+  });
+
+  // Factory constructor for creating a Comment object from Firestore data
+  factory Comment.fromMap(Map<String, dynamic> data) {
+    return Comment(
+      id: data['id'] ?? '',
+      userId: data['userId'] ?? '',
+      username: data['username'] ?? '',
+      profileImageUrl: data['profileImageUrl'] ?? '',
+      text: data['text'] ?? '',
+      timestamp: (data['timestamp'] as Timestamp).toDate(),
+    );
+  }
+
+  // Method to convert a Comment object to a map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'userId': userId,
+      'username': username,
+      'profileImageUrl': profileImageUrl,
+      'text': text,
+      'timestamp': timestamp,
+    };
+  }
+}
+
 class Post {
   String id;
   String userId;
   String username;
+  String profileImageUrl;
   String title;
   String description;
-  String text;
-  Timestamp timestamp;
-  String profileImageUrl;
+  List<String> imageUrls;
   int likes;
   List<String> likedBy;
-  List<String> imageUrls;
-  String origin; // Add this line
+  String url;
+  DateTime timestamp;
+  List<Comment> comments = [];
+  int commentCount;
 
   Post({
     required this.id,
     required this.userId,
     required this.username,
+    required this.profileImageUrl,
     required this.title,
     required this.description,
-    required this.text,
-    required this.timestamp,
-    this.profileImageUrl = '',
+    required this.imageUrls,
     required this.likes,
     required this.likedBy,
-    required this.imageUrls,
-    required this.origin, // Add this line
+    required this.url,
+    required this.timestamp,
+    required this.commentCount,
   });
 
+  // Factory constructor voor het maken van een Post-object vanuit Firestore data
   factory Post.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    List<String> imageUrls = [];
-    if (data.containsKey('imageUrls')) {
-      imageUrls = List<String>.from(data['imageUrls']);
-    } else if (data.containsKey('imageURL')) {
-      imageUrls = [data['imageURL']];
-    }
+    Map data = doc.data() as Map;
     return Post(
       id: doc.id,
       userId: data['userId'] ?? '',
       username: data['username'] ?? '',
+      profileImageUrl: data['profileImageUrl'] ?? '',
       title: data['title'] ?? '',
       description: data['description'] ?? '',
-      text: data['text'] ?? '',
-      timestamp: data['timestamp'],
-      profileImageUrl: data['profileImageUrl'] ?? '',
+      imageUrls: List<String>.from(data['imageUrls'] ?? []),
       likes: data['likes'] ?? 0,
       likedBy: List<String>.from(data['likedBy'] ?? []),
-      imageUrls: imageUrls,
-      origin: data['origin'] ?? '', // Initialize origin attribute
+      url: data['url'] ?? '',
+      timestamp: (data['timestamp'] as Timestamp).toDate(),
+      commentCount: data['commentCount'] ?? 0,
     );
   }
 
-  void setProfileImageUrl(String url) {
-    profileImageUrl = url;
+  // Methode om een Post-object om te zetten naar een map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'userId': userId,
+      'username': username,
+      'profileImageUrl': profileImageUrl,
+      'title': title,
+      'description': description,
+      'imageUrls': imageUrls,
+      'likes': likes,
+      'likedBy': likedBy,
+      'url': url,
+      'timestamp': timestamp,
+      'commentCount': commentCount,
+    };
   }
 }
